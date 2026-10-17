@@ -3,60 +3,174 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cloud Anomaly Detector</title>
+  <title>CloudGuard AI — Cloud Anomaly Detector</title>
+  <meta name="description" content="Real-time cloud resource anomaly detection and cost prediction powered by XGBoost + SHAP explainability"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="/static/css/style.css"/>
+  <link rel="stylesheet" href="/static/css/animations.css"/>
 </head>
 <body>
+
+<!-- ── FLOATING BACKGROUND BLOBS ────────────────────────────── -->
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="bg-blob bg-blob-3"></div>
 
 <!-- ── HEADER ───────────────────────────────────────────────── -->
 <header class="header">
   <div class="header-left">
     <div class="logo">
-      <span class="logo-icon">⬡</span>
-      <span class="logo-text">CloudGuard <span class="logo-sub">AI</span></span>
+      <div class="logo-icon-wrap">🛡️</div>
+      <span class="logo-text">CloudGuard <span class="ai">AI</span></span>
+      <span class="version-tag">v1.0</span>
     </div>
-    <div class="status-pill" id="statusPill">
+    <div class="status-pill" id="statusPill" style="opacity:0.5">
       <span class="pulse-dot"></span> LIVE
     </div>
   </div>
   <div class="header-right">
-    <span class="header-meta" id="lastUpdate">Waiting for data...</span>
+    <span class="header-meta" id="lastUpdate">⏳ Waiting for data...</span>
     <button class="btn-pause" id="btnPause" onclick="togglePause()">⏸ Pause</button>
   </div>
 </header>
 
-<!-- ── SUMMARY CARDS ────────────────────────────────────────── -->
+<!-- ── TICKER BAR ────────────────────────────────────────────── -->
+<div class="ticker-bar">
+  <div class="ticker-track" id="tickerTrack">
+    <div class="ticker-item">
+      <span class="ticker-label">MODEL</span>
+      <span class="ticker-val blue">XGBoost</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">CLASSIFIER F1</span>
+      <span class="ticker-val green">0.9389</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">ROC-AUC</span>
+      <span class="ticker-val green">0.9960</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">REGRESSOR R²</span>
+      <span class="ticker-val green">0.9905</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">MAE</span>
+      <span class="ticker-val blue">$0.12/hr</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">ANOMALY RATE</span>
+      <span class="ticker-val">~8%</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">FEATURES</span>
+      <span class="ticker-val blue">96</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">RESOURCES</span>
+      <span class="ticker-val">10 AWS</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">EXPLAINABILITY</span>
+      <span class="ticker-val blue">SHAP TreeExplainer</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">POLL INTERVAL</span>
+      <span class="ticker-val">5s</span>
+    </div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">MODEL</span>
+      <span class="ticker-val blue">XGBoost</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">CLASSIFIER F1</span>
+      <span class="ticker-val green">0.9389</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">ROC-AUC</span>
+      <span class="ticker-val green">0.9960</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">REGRESSOR R²</span>
+      <span class="ticker-val green">0.9905</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">MAE</span>
+      <span class="ticker-val blue">$0.12/hr</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">ANOMALY RATE</span>
+      <span class="ticker-val">~8%</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">FEATURES</span>
+      <span class="ticker-val blue">96</span>
+    </div>
+    <div class="ticker-dot"></div>
+    <div class="ticker-item">
+      <span class="ticker-label">RESOURCES</span>
+      <span class="ticker-val">10 AWS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMMARY CARDS ─────────────────────────────────────────── -->
 <section class="cards-row">
-  <div class="card">
+  <div class="card anim-card-rise">
+    <span class="card-icon">📡</span>
     <div class="card-label">Total Predictions</div>
-    <div class="card-value" id="totalPredictions">0</div>
+    <div class="card-value blue" id="totalPredictions">0</div>
     <div class="card-sub">since session start</div>
   </div>
-  <div class="card">
+  <div class="card anim-card-rise">
+    <span class="card-icon">⚠️</span>
     <div class="card-label">Anomalies Detected</div>
     <div class="card-value red" id="totalAnomalies">0</div>
     <div class="card-sub" id="anomalyRate">0.00% rate</div>
   </div>
-  <div class="card">
+  <div class="card anim-card-rise">
+    <span class="card-icon">🔴</span>
     <div class="card-label">Critical Alerts</div>
     <div class="card-value orange" id="criticalCount">0</div>
     <div class="card-sub" id="highCount">0 high severity</div>
   </div>
-  <div class="card">
+  <div class="card anim-card-rise">
+    <span class="card-icon">💰</span>
     <div class="card-label">Avg Predicted Cost</div>
     <div class="card-value green" id="avgCost">$0.00</div>
     <div class="card-sub">per resource / hour</div>
   </div>
 </section>
 
-<!-- ── MAIN GRID ─────────────────────────────────────────────── -->
+<!-- ── MAIN GRID ──────────────────────────────────────────────── -->
 <main class="main-grid">
 
-  <!-- Live CPU + Cost chart -->
-  <section class="panel panel-wide">
+  <!-- ── Live Metrics Stream (wide) ───────────────────────────── -->
+  <section class="panel panel-wide scanning">
     <div class="panel-header">
-      <span class="panel-title">Live Metrics Stream</span>
+      <span class="panel-title">
+        <span class="panel-title-icon blue">📈</span>
+        Live Metrics Stream
+      </span>
       <select class="selector" id="resourceSelector" onchange="switchResource()">
         <option value="all">All Resources</option>
       </select>
@@ -66,34 +180,46 @@
     </div>
   </section>
 
-  <!-- Cost forecast chart -->
+  <!-- ── Cost Forecast ────────────────────────────────────────── -->
   <section class="panel">
     <div class="panel-header">
-      <span class="panel-title">Cost Forecast ($/hr)</span>
+      <span class="panel-title">
+        <span class="panel-title-icon green">💵</span>
+        Cost Forecast
+      </span>
+      <span class="panel-sub">$/hr</span>
     </div>
     <div class="chart-wrap">
       <canvas id="costChart"></canvas>
     </div>
   </section>
 
-  <!-- Anomaly feed -->
+  <!-- ── Anomaly Feed ──────────────────────────────────────────── -->
   <section class="panel">
     <div class="panel-header">
-      <span class="panel-title">Anomaly Feed</span>
+      <span class="panel-title">
+        <span class="panel-title-icon red">🚨</span>
+        Anomaly Feed
+      </span>
       <span class="badge-count" id="feedCount">0 alerts</span>
     </div>
     <div class="feed" id="anomalyFeed">
-      <div class="feed-empty">Monitoring... no anomalies yet</div>
+      <div class="feed-empty">🟢 Monitoring... no anomalies yet</div>
     </div>
   </section>
 
-  <!-- Latest prediction detail -->
+  <!-- ── Latest Prediction Detail (wide) ──────────────────────── -->
   <section class="panel panel-wide">
     <div class="panel-header">
-      <span class="panel-title">Latest Prediction Detail</span>
-      <span class="panel-sub" id="detailResource">—</span>
+      <span class="panel-title">
+        <span class="panel-title-icon purple">🔍</span>
+        Latest Prediction Detail
+      </span>
+      <span class="panel-sub" id="detailResource">— waiting —</span>
     </div>
+
     <div class="detail-grid">
+      <!-- Anomaly Probability -->
       <div class="detail-block">
         <div class="detail-label">Anomaly Probability</div>
         <div class="prob-bar-wrap">
@@ -101,45 +227,66 @@
         </div>
         <div class="detail-value" id="probValue">—</div>
       </div>
+
+      <!-- Severity -->
       <div class="detail-block">
         <div class="detail-label">Severity</div>
         <div class="severity-badge" id="severityBadge">—</div>
       </div>
+
+      <!-- Predicted Cost -->
       <div class="detail-block">
         <div class="detail-label">Predicted Cost</div>
         <div class="detail-value big" id="costValue">—</div>
       </div>
+
+      <!-- Resource Type -->
       <div class="detail-block">
         <div class="detail-label">Resource Type</div>
         <div class="detail-value" id="resourceType">—</div>
       </div>
     </div>
 
-    <!-- SHAP reasons -->
+    <!-- SHAP Explanations -->
     <div class="shap-grid">
       <div class="shap-col">
-        <div class="shap-title">Why anomaly? (Top 5 SHAP)</div>
+        <div class="shap-col-header">
+          <span class="panel-title-icon red" style="width:18px;height:18px;font-size:0.65rem">⚠️</span>
+          <div class="shap-title">Why anomaly? — Top 5 SHAP Features</div>
+        </div>
         <div id="clfShap" class="shap-list"></div>
       </div>
       <div class="shap-col">
-        <div class="shap-title">Why this cost? (Top 5 SHAP)</div>
+        <div class="shap-col-header">
+          <span class="panel-title-icon green" style="width:18px;height:18px;font-size:0.65rem">💵</span>
+          <div class="shap-title">Why this cost? — Top 5 SHAP Features</div>
+        </div>
         <div id="regShap" class="shap-list"></div>
       </div>
     </div>
   </section>
 
-  <!-- Resource health grid -->
+  <!-- ── Resource Health Grid ──────────────────────────────────── -->
   <section class="panel">
     <div class="panel-header">
-      <span class="panel-title">Resource Health</span>
+      <span class="panel-title">
+        <span class="panel-title-icon green">🖥️</span>
+        Resource Health
+      </span>
+      <span class="panel-sub">10 resources</span>
     </div>
-    <div class="resource-grid" id="resourceGrid"></div>
+    <div class="resource-grid" id="resourceGrid">
+      <!-- tiles injected by JS -->
+    </div>
   </section>
 
-  <!-- Anomaly type breakdown -->
+  <!-- ── Severity Distribution ─────────────────────────────────── -->
   <section class="panel">
     <div class="panel-header">
-      <span class="panel-title">Severity Distribution</span>
+      <span class="panel-title">
+        <span class="panel-title-icon orange">🍩</span>
+        Severity Distribution
+      </span>
     </div>
     <div class="chart-wrap chart-wrap-sm">
       <canvas id="severityChart"></canvas>
@@ -148,7 +295,15 @@
 
 </main>
 
-<link rel="stylesheet" href="/static/css/animations.css"/>
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer class="footer">
+  <span>CloudGuard AI</span> &nbsp;·&nbsp;
+  XGBoost Anomaly Detector + Cost Predictor &nbsp;·&nbsp;
+  SHAP Explainability &nbsp;·&nbsp;
+  <span>FastAPI</span> + Vanilla JS &nbsp;·&nbsp;
+  Built with ❤️
+</footer>
+
 <script src="/static/js/utils.js"></script>
 <script src="/static/js/charts.js"></script>
 <script src="/static/js/api.js"></script>
