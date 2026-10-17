@@ -119,8 +119,8 @@ CloudGuard-AI-Cloud-Resource-Anomaly-Detector-Cost-Predictor/
 
 ```bash
 # 1. Clone
-https://github.com/vaibhavr54/CloudGuard-AI-Cloud-Resource-Anomaly-Detector-Cost-Predictor.git
-cd CloudGuard-AI-Cloud-Resource-Anomaly-Detector-Cost-Predictor
+git clone https://github.com/Shreyash0079/cloudsafetypush.git
+cd cloudsafetypush
 
 # 2. Create virtual environment
 python -m venv venv
